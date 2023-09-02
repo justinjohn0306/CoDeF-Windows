@@ -36,6 +36,7 @@ from metrics import psnr
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning import LightningModule, Trainer
 from pytorch_lightning.loggers import TensorBoardLogger
+from pytorch_lightning.strategies import DDPStrategy
 
 
 class ImplicitVideoSystem(LightningModule):
@@ -544,7 +545,7 @@ def main(hparams):
                       profiler="simple" if len(hparams.gpus) == 1 else None,
                       val_check_interval=hparams.valid_iters,
                       limit_val_batches=hparams.valid_batches,
-                      strategy="ddp_find_unused_parameters_true")
+                      strategy=DDPStrategy(process_group_backend="gloo", find_unused_parameters=True))
 
     if hparams.test:
         trainer.test(system, dataloaders=system.test_dataloader())
